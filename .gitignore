@@ -15,3 +15,4 @@
 # vendor/
 ktu-telegram-notification-bot
 data/
+conf.json

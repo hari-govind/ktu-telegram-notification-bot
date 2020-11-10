@@ -30,8 +30,8 @@ func isNewNotification(notification *scrapper.Notification, db *badger.DB) bool 
 }
 
 // Poll for new notifications from the official KTU announcements page
-func ListenAndRelayNotifications(c chan scrapper.Notification, wg *sync.WaitGroup) {
-	ticker := time.NewTicker(5 * time.Minute) //Minutes before each poll
+func ListenAndRelayNotifications(c chan scrapper.Notification, wg *sync.WaitGroup, interval int) {
+	ticker := time.NewTicker(time.Duration(interval) * time.Minute) //Minutes before each poll
 	defer ticker.Stop()
 	defer wg.Done()
 	db, err := badger.Open(badger.DefaultOptions(dbFolder).WithLogger(nil))
