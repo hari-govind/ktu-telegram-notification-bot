@@ -1,6 +1,7 @@
 package scrapper
 
 import (
+	_ "errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
@@ -31,20 +32,23 @@ type link struct {
 	title string
 }
 
-type notification struct {
-	date  string
-	title string
-	desc  string
-	links []link
+type Notification struct {
+	Date  string
+	Title string
+	Desc  string
+	Links []link
 }
 
 //Returns most recent n notifications(defined by number) in array
-func ScrapeNotifications(number int) []notification {
+func ScrapeNotifications(number int) ([]Notification, error) {
 	baseURL := "https://ktu.edu.in"
 	body := GetHTML()
 	defer body.Close()
-	doc, _ := goquery.NewDocumentFromReader(body)
-	notifications := make([]notification, 0)
+	doc, err := goquery.NewDocumentFromReader(body)
+	if err != nil {
+		return []Notification{Notification{}}, err
+	}
+	notifications := make([]Notification, 0)
 	doc.Find("tr").EachWithBreak(func(i int, s *goquery.Selection) bool {
 		if i == number {
 			return false
@@ -61,8 +65,8 @@ func ScrapeNotifications(number int) []notification {
 			currentLink := link{hrefVal, li.Text()}
 			links = append(links, currentLink)
 		})
-		notifications = append(notifications, notification{date, title, desc, links})
+		notifications = append(notifications, Notification{date, title, desc, links})
 		return true
 	})
-	return notifications
+	return notifications, nil
 }
