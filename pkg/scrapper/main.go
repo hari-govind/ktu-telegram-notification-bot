@@ -28,8 +28,8 @@ func formatDate(date string) string {
 }
 
 type link struct {
-	url   string
-	title string
+	Url   string
+	Title string
 }
 
 type Notification struct {

@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	_ "fmt"
 	"io/ioutil"
 	"ktu-telegram-notification-bot/pkg/notification"
 	"ktu-telegram-notification-bot/pkg/scrapper"
+	"ktu-telegram-notification-bot/pkg/telegram"
 	"log"
 	"sync"
 )
@@ -30,8 +31,11 @@ func main() {
 	c := make(chan scrapper.Notification)
 	wg.Add(1)
 	go notification.ListenAndRelayNotifications(c, &wg, conf.Interval)
-	for i := range c {
-		fmt.Println(i)
+	for notification := range c {
+		_, err := telegram.SendNotification(notification, conf.Token, conf.Channel)
+		if err != nil {
+			log.Print(err)
+		}
 	}
 	wg.Wait()
 }
