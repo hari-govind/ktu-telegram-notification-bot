@@ -39,9 +39,7 @@ func ListenAndRelayNotifications(c chan scrapper.Notification, wg *sync.WaitGrou
 		notifications, err := scrapper.ScrapeNotifications(5)
 		if err != nil {
 			log.Print(err)
-		}
-		if err != nil {
-			log.Fatal(err)
+			continue
 		}
 		for _, notification := range notifications {
 			if isNewNotification(&notification, db) {

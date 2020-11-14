@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io"
-	"log"
+	_ "log"
 	"net/http"
 	_ "os"
 	"strings"
 )
 
 // Grabs KTU notification page as HTML
-func GetHTML() io.ReadCloser {
+func GetHTML() (io.ReadCloser, error) {
 	ktuURL := "https://ktu.edu.in/eu/core/announcements.htm"
 	response, err := http.Get(ktuURL)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return response.Body
+	return response.Body, err
 }
 
 func formatDate(date string) string {
@@ -42,7 +42,10 @@ type Notification struct {
 //Returns most recent n notifications(defined by number) in array
 func ScrapeNotifications(number int) ([]Notification, error) {
 	baseURL := "https://ktu.edu.in"
-	body := GetHTML()
+	body, err := GetHTML()
+	if err != nil {
+		return []Notification{Notification{}}, err
+	}
 	defer body.Close()
 	doc, err := goquery.NewDocumentFromReader(body)
 	if err != nil {
