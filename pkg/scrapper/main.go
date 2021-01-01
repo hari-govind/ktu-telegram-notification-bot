@@ -23,7 +23,11 @@ func GetHTML() (io.ReadCloser, error) {
 
 func formatDate(date string) string {
 	dateArray := strings.Fields(date)
-	date = fmt.Sprintf("%s, %s %s %s", dateArray[0], dateArray[2], dateArray[1], dateArray[5])
+	if len(dateArray) < 6 { // If scrapped non-regular format, return -
+		date = "-"
+	} else {
+		date = fmt.Sprintf("%s, %s %s %s", dateArray[0], dateArray[2], dateArray[1], dateArray[5])
+	}
 	return date
 }
 
@@ -56,7 +60,7 @@ func ScrapeNotifications(number int) ([]Notification, error) {
 		if i == number {
 			return false
 		}
-		date := formatDate(strings.TrimSpace(s.Find("td strong").First().Text()))
+		date := formatDate(strings.TrimSpace(s.Find("td[width=\"9%\"]").First().Text()))
 		title := s.Find("li b").First().Text()
 		desc := strings.TrimSpace(s.Find("li").Contents().Eq(3).Text())
 		links := make([]link, 0)
